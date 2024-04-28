@@ -1,0 +1,17 @@
+version: '3.7'
+services:
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 11435:11435
+  mongo:
+    image: mongodb/atlas
+    privileged: true
+    command: |
+      /bin/bash -c "atlas deployments setup --type local --port 27778 --bindIpAll --username root --password {your-password} --force && tail -f /dev/null"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 27778:27778
