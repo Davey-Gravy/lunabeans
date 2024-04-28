@@ -1,4 +1,5 @@
 import requests
+import json
 
 # Set your API key
 API_KEY = 'AIzaSyD3n85SEaOKpRCqEJcguQjC2jMowXvESyk'
@@ -21,4 +22,6 @@ if __name__ == "__main__":
     query = 'python programming'  # Example search query
     max_results = 5  # Example maximum number of results
     search_results = search_videos(query, max_results)
+    with open('test.json', 'w') as f:
+        json.dump(search_results, f, indent=4)
     print(search_results)
