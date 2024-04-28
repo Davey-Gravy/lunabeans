@@ -33,6 +33,34 @@ def get_playlist_items(playlist_id, max_results=10):
     
     return video_ids
 
+def get_video_info(video_id):
+    base_url = 'https://www.googleapis.com/youtube/v3/videos'
+    params = {
+        'part': 'statistics',
+        'id': video_id,
+        'key': API_KEY
+    }
+    response = requests.get(base_url, params=params)
+    data = response.json()
+    
+    # Extract the view count, like and dislike counts, and channel size from the response data
+    view_count = int(data['items'][0]['statistics']['viewCount'])
+    like_count = int(data['items'][0]['statistics']['likeCount'])
+    # dislike_count = int(data['items'][0]['statistics']['dislikeCount'])
+    # channel_size = int(data['items'][0]['statistics']['channelSize'])
+    
+    # Return the video information as a dictionary
+    return {
+        'view_count': view_count,
+        'like_count': like_count
+    }
+    # return {
+    #     'view_count': view_count,
+    #     'like_count': like_count,
+    #     'dislike_count': dislike_count,
+    #     'channel_size': channel_size
+    # }
+
 # Example usage
 if __name__ == "__main__":
     query = 'python programming'  # Example search query

@@ -1,5 +1,5 @@
 from youtube_transcript_api import YouTubeTranscriptApi
-from search import search_videos, get_playlist_items
+from search import search_videos, get_playlist_items, get_video_info
 
 def getTranscriptFromVideo(video_id):
     '''
@@ -27,40 +27,45 @@ def getTranscriptFromPlaylist(playlist_id):
         out: string containing all video transcripts
     '''
     videoIds = get_playlist_items(playlist_id)
-    response = [getTranscriptFromVideo(vidId) for vidId in videoIds if getTranscriptFromVideo(vidId) is not None]
+    response = [getTranscriptFromVideo(videoId) for videoId in videoIds if getTranscriptFromVideo(videoId) is not None]
     out = ' '.join(response)
     return out
 
-def searchQueryToTranscripts(search_term, max_results=2):
+def searchQueryToData(search_term, max_results=2, ignorePlaylist=True):
     '''
     Input: 
         search_term: string
     Output:
-        transcripts: list of strings containing full transcripts of each video in search result
+        videodata: dictionary mapping videoId to tuple of video transcript and video metadata
+            metadata: views_count, likes_count    
     '''
     results = search_videos(search_term, max_results)
-    transcripts = []
+    videodata = {}
     for item in results['items']:
         itemKind = item['id']['kind']
         if itemKind == "youtube#video":
-            transcripts.append(getTranscriptFromVideo(item['id']['videoId']))
+            videoId = item['id']['videoId']
+            transcript = getTranscriptFromVideo(videoId)
+            video_metadata = get_video_info(videoId)
+            videodata[videoId] = (transcript, video_metadata)
         elif itemKind == 'youtube#playlist':
-            transcripts.append(getTranscriptFromPlaylist(item['id']['playlistId']))
+            if ignorePlaylist:
+                pass
+            # else:
+            #     transcripts.append(getTranscriptFromPlaylist(item['id']['playlistId']))
 
-    transcripts = [transcript for transcript in transcripts if transcript is not None]
-    return transcripts
+    # transcripts = [transcript for transcript in transcripts if transcript is not None]
+    # return transcripts
+    return videodata
 
 if __name__ == "__main__":
     search_term = 'dog eats bean burrito in one second'
-    print(searchQueryToTranscripts(search_term,5))
-    # results = search_videos(search_term, 5)
-    # for item in results['items']:
-    #     itemKind = item['id']['kind']
-    #     if itemKind == "youtube#video":
-    #         print(item['id']['videoId'])
-    #     elif itemKind == 'youtube#playlist':
-    #         print(item['id']['playlistId'])
-        
+    data = searchQueryToData(search_term,5)
+
+    for (key, item) in data.items():
+        print(key + ": " + str(item[0]))
+    # print(getTranscriptFromPlaylist('PLEG35I51CH7W6bOW3UbkjHRSQfdSk3TRh'))
+
     # videoID = 'TOe_TvQLAA'
     # videoID1 = 'PLsyeobzWxl7poL9JTVyndKe62ieoN-MZ3'
     # videoID2 = 'Wb3UrJjAac4'
