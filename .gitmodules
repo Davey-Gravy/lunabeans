@@ -1,0 +1,3 @@
+[submodule "api-samples"]
+	path = api-samples
+	url = https://github.com/youtube/api-samples.git
